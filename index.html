@@ -28,14 +28,14 @@
             focus:outline-none;
             focus:ring-2;
             focus:ring-blue-500;
+            background: #fff;
+            color: #111827;
         }
-        
         .matrix-input.dark {
-            background-color: #374151;
-            border-color: #4b5563;
-            color: white;
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
+            color: white !important;
         }
-        
         .matrix-result {
             width: 4rem;
             height: 4rem;
@@ -45,76 +45,70 @@
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
         }
-        
         .matrix-result.dark {
-            background-color: #374151;
-            border-color: #4b5563;
-            color: white;
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
+            color: white !important;
         }
-        
         .matrix-result.light {
-            background-color: #dbeafe;
-            border-color: #93c5fd;
-            color: #1e40af;
-            font-weight: 500;
+            background-color: #dbeafe !important;
+            border-color: #93c5fd !important;
+            color: #1e40af !important;
         }
-        
-        /* Dark mode styles */
-        .dark {
-            background-color: #111827;
-            color: white;
+
+        /* Remove redundant dark base style: rely on Tailwind for element theming */
+
+        /* More specific label for light/dark select */
+        .custom-select {
+            background: #fff;
+            color: #374151;
+            border: 1px solid #d1d5db;
         }
-        
-        .dark .bg-white {
-            background-color: #1f2937;
+        .custom-select.dark {
+            background: #374151;
+            color: #fff;
+            border: 1px solid #4b5563;
         }
-        
-        .dark .bg-gray-50 {
-            background-color: #111827;
+        .custom-btn {
+            background: #2563eb;
+            color: #fff;
         }
-        
-        .dark .bg-gray-800 {
-            background-color: #1f2937;
+        .custom-btn.dark {
+            background: #1f2937;
+            color: #bfdbfe;
+            border: 1px solid #4b5563;
         }
-        
-        .dark .bg-gray-900 {
-            background-color: #111827;
+        .custom-btn-outline {
+            background: #fff;
+            color: #1e3a8a;
+            border: 1px solid #d1d5db;
         }
-        
-        .dark .text-gray-900 {
-            color: white;
+        .custom-btn-outline.dark {
+            background: #1f2937;
+            color: #fff;
+            border: 1px solid #4b5563;
         }
-        
-        .dark .text-gray-700 {
-            color: #d1d5db;
+
+        /* Fix card colors for both themes */
+        .card {
+            background-color: #fff;
+            color: #1e3a8a;
+            border: 1px solid #e5e7eb;
         }
-        
-        .dark .border-gray-300 {
-            border-color: #4b5563;
+        .card.dark {
+            background-color: #1f2937 !important;
+            color: #fff !important;
+            border: 1px solid #4b5563 !important;
         }
-        
-        .dark .border-gray-600 {
-            border-color: #6b7280;
+        .card-header {
+            border-bottom: 1px solid #e5e7eb;
         }
-        
-        .dark .bg-red-50 {
-            background-color: #7f1d1d;
+        .card-header.dark {
+            border-bottom: 1px solid #4b5563;
         }
-        
-        .dark .text-red-700 {
-            color: #fca5a5;
+        .card-content {
         }
-        
-        .dark .bg-blue-50 {
-            background-color: #1e3a8a;
-        }
-        
-        .dark .text-blue-900 {
-            color: #93c5fd;
-        }
-        
-        .dark .border-blue-200 {
-            border-color: #3b82f6;
+        .card-title {
         }
     </style>
 </head>
@@ -262,12 +256,12 @@
                 return num.toFixed(2);
             };
 
-            // Simple Select component
+            // Simple Select component with theme
             const Select = ({ value, onValueChange, children }) => {
                 return React.createElement('select', {
                     value,
                     onChange: (e) => onValueChange(e.target.value),
-                    className: 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                    className: `custom-select${theme === "dark" ? " dark" : ""} w-full p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`
                 }, children);
             };
 
@@ -276,51 +270,52 @@
                 return React.createElement('option', { value }, children);
             };
 
-            // Simple Button component
+            // Simple Button component themed
             const Button = ({ onClick, children, variant = "default", className = "" }) => {
-                const baseClasses = "px-4 py-2 rounded-md font-medium transition-colors duration-200";
-                const variantClasses = {
-                    default: "bg-blue-600 text-white hover:bg-blue-700",
-                    outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700",
-                    secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                };
-                
+                let base = "rounded-md font-medium transition-colors duration-200 px-4 py-2 ";
+                let variantClass = "";
+                if (variant === "default") {
+                    variantClass = `custom-btn${theme === "dark" ? " dark" : ""}`;
+                } else if (variant === "outline") {
+                    variantClass = `custom-btn-outline${theme === "dark" ? " dark" : ""}`;
+                } else if (variant === "secondary") {
+                    variantClass = `${theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-800"} hover:bg-gray-300 dark:hover:bg-gray-600`;
+                }
                 return React.createElement('button', {
                     onClick,
-                    className: `${baseClasses} ${variantClasses[variant]} ${className}`
+                    className: `${base} ${variantClass} ${className}`
                 }, children);
             };
 
-            // Simple Card components
+            // Card components themed
             const Card = ({ children, className = "" }) => {
                 return React.createElement('div', {
-                    className: `bg-white rounded-lg shadow-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700 ${className}`
+                    className: `card${theme === "dark" ? " dark" : ""} rounded-lg shadow-md ${className}`
                 }, children);
             };
-
             const CardHeader = ({ children, className = "" }) => {
                 return React.createElement('div', {
-                    className: `p-6 border-b border-gray-200 dark:border-gray-700 ${className}`
+                    className: `card-header${theme === "dark" ? " dark" : ""} p-6`
                 }, children);
             };
-
             const CardContent = ({ children, className = "" }) => {
                 return React.createElement('div', {
-                    className: `p-6 ${className}`
+                    className: `card-content p-6`
                 }, children);
             };
-
             const CardTitle = ({ children, className = "" }) => {
                 return React.createElement('h3', {
-                    className: `text-lg font-semibold ${className}`
+                    className: `card-title text-lg font-semibold ${theme === "dark" ? "text-white" : "text-blue-800"} ${className}`
                 }, children);
             };
 
-            // Simple Label component
+            // Label themed
             const Label = ({ htmlFor, children }) => {
                 return React.createElement('label', {
                     htmlFor,
-                    className: 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+                    className: `${theme === "dark" 
+                        ? "block text-sm font-medium text-gray-300 mb-1"
+                        : "block text-sm font-medium text-gray-700 mb-1"}`
                 }, children);
             };
 
@@ -337,10 +332,10 @@
                         className: "flex items-center gap-3"
                     },
                         React.createElement('div', {
-                            className: "h-8 w-8 text-blue-600"
+                            className: `h-8 w-8 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`
                         }, "🧮"),
                         React.createElement('h1', {
-                            className: "text-3xl font-bold"
+                            className: `text-3xl font-bold ${theme === "dark" ? "text-white" : "text-blue-900"}`
                         }, "Matrix Solver")
                     ),
                     React.createElement(Button, {
@@ -362,9 +357,9 @@
                     ),
                     React.createElement(CardContent, null,
                         React.createElement('p', {
-                            className: "text-sm opacity-75"
+                            className: `text-sm opacity-75 ${theme === "dark" ? "text-gray-300" : "text-gray-800"}`
                         },
-                            "1. Set the dimensions for both matrices (1-5 rows/cols)\\n2. Enter numeric values into the matrix cells\\n3. Select an operation (add, subtract, multiply, or scalar)\\n4. Click \"Calculate\" to see the result\\n5. Use \"Clear All\" to reset everything"
+                            "1. Set the dimensions for both matrices (1-5 rows/cols)\n2. Enter numeric values into the matrix cells\n3. Select an operation (add, subtract, multiply, or scalar)\n4. Click Calculate to view the result. "
                         )
                     )
                 ),
@@ -554,7 +549,7 @@
                                                 type: "number",
                                                 value: value,
                                                 onChange: (e) => handleMatrixAChange(i, j, e.target.value),
-                                                className: `matrix-input ${theme === "dark" ? "dark" : ""}`,
+                                                className: `matrix-input${theme === "dark" ? " dark" : ""}`,
                                                 style: {
                                                     width: "4rem",
                                                     height: "4rem"
@@ -587,7 +582,7 @@
                                                 type: "number",
                                                 value: value,
                                                 onChange: (e) => handleMatrixBChange(i, j, e.target.value),
-                                                className: `matrix-input ${theme === "dark" ? "dark" : ""}`,
+                                                className: `matrix-input${theme === "dark" ? " dark" : ""}`,
                                                 style: {
                                                     width: "4rem",
                                                     height: "4rem"
@@ -618,7 +613,7 @@
                                     row.map((value, j) => 
                                         React.createElement('div', {
                                             key: `result-cell-${i}-${j}`,
-                                            className: `matrix-result ${theme === "dark" ? "dark" : "light"}`,
+                                            className: `matrix-result${theme === "dark" ? " dark" : " light"}`,
                                             style: {
                                                 width: "4rem",
                                                 height: "4rem"
